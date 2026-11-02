@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/account.dart';
 import '../providers/accounts_provider.dart';
 import '../services/api_config.dart';
 import '../services/widget_bridge_service.dart';
@@ -62,7 +63,7 @@ class _WidgetSettingsScreenState extends State<WidgetSettingsScreen> {
       await _bridge.setWidgetApiKey(key);
       final accounts = context.mounted
           ? Provider.of<AccountsProvider>(context, listen: false).accounts
-          : const [];
+          : const <Account>[];
       if (accounts.isNotEmpty) await _bridge.syncAccounts(accounts);
     }
 

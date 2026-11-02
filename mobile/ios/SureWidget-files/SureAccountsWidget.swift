@@ -110,9 +110,9 @@ struct AccountsWidgetView: View {
             } else {
                 switch family {
                 case .accessoryRectangular: LockScreenView(entry: entry)
-                case .systemSmall: ListLayout(entry: entry, maxRows: 3, showInstitution: false, compact: true)
-                case .systemMedium: ListLayout(entry: entry, maxRows: 4, showInstitution: true, compact: false)
-                default: ListLayout(entry: entry, maxRows: 10, showInstitution: true, compact: false)
+                case .systemSmall: ListLayout(entry: entry, maxRows: 3, compact: true)
+                case .systemMedium: ListLayout(entry: entry, maxRows: 4, compact: false)
+                default: ListLayout(entry: entry, maxRows: 12, compact: false)
                 }
             }
         }
@@ -123,7 +123,6 @@ struct AccountsWidgetView: View {
 private struct ListLayout: View {
     let entry: AccountsEntry
     let maxRows: Int
-    let showInstitution: Bool
     let compact: Bool
 
     var body: some View {
@@ -134,11 +133,15 @@ private struct ListLayout: View {
         VStack(alignment: .leading, spacing: compact ? 4 : 6) {
             Header(entry: entry, compact: compact)
 
-            ForEach(shown) { account in
-                AccountRow(account: account, showInstitution: showInstitution, compact: compact)
+            // Rows take whatever space is left and are clipped, so the header
+            // and footer always stay visible even with large text sizes.
+            VStack(alignment: .leading, spacing: compact ? 4 : 5) {
+                ForEach(shown) { account in
+                    AccountRow(account: account, compact: compact)
+                }
             }
-
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .clipped()
 
             HStack(spacing: 4) {
                 if hidden > 0 {
@@ -163,19 +166,21 @@ private struct Header: View {
     let compact: Bool
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 0) {
-                if let netWorth = entry.netWorth, !compact {
-                    Text("Net worth")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    Text(netWorth)
-                        .font(.headline)
-                        .privacySensitive()
-                } else {
-                    Text("Accounts")
-                        .font(compact ? .caption.weight(.semibold) : .headline)
-                }
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            if let netWorth = entry.netWorth, !compact {
+                Text(netWorth)
+                    .font(.headline)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .privacySensitive()
+                Text("net worth")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            } else {
+                Text("Accounts")
+                    .font(compact ? .caption.weight(.semibold) : .headline)
             }
             Spacer(minLength: 0)
             Button(intent: RefreshAccountsIntent()) {
@@ -190,7 +195,6 @@ private struct Header: View {
 
 private struct AccountRow: View {
     let account: SureWidgetAccount
-    let showInstitution: Bool
     let compact: Bool
 
     var body: some View {
@@ -204,19 +208,11 @@ private struct AccountRow: View {
             }
         } else {
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(account.name)
-                        .font(.subheadline)
-                        .lineLimit(1)
-                    if showInstitution, let institution = account.institutionName, !institution.isEmpty {
-                        Text(institution)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(1)
-                    }
-                }
+                Text(account.name)
+                    .font(.footnote)
+                    .lineLimit(1)
                 Spacer(minLength: 8)
-                balanceText.font(.subheadline.weight(.semibold))
+                balanceText.font(.footnote.weight(.semibold))
             }
         }
     }

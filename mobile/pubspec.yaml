@@ -41,6 +41,10 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.4
 
 flutter:
+  # Build iOS plugins with CocoaPods (pinned Sentry 8.46.0); SPM resolves a
+  # newer sentry-cocoa that sentry_flutter 8.14.2 does not compile against.
+  config:
+    enable-swift-package-manager: false
   uses-material-design: true
   generate: true
   assets:
