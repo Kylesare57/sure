@@ -134,6 +134,3 @@ logs/security/
 # Ignore Playwright artifacts
 playwright-report/
 .playwright-mcp
-
-# Self-hosting secrets
-selfhost/.env
