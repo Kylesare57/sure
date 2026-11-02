@@ -47,6 +47,8 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>SureAppGroup</key>
+	<string>group.com.google.ios.youtube</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Authenticate with Face ID to unlock the app</string>
 	<key>CFBundleURLTypes</key>
