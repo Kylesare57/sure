@@ -71,12 +71,14 @@ struct AccountsProvider: AppIntentTimelineProvider {
 extension AccountsEntry {
     var accounts: [SureWidgetAccount] {
         let all = snapshot?.accounts ?? []
-        // Accounts picked under "Edit Widget": show exactly those, in the picked order.
-        if let picked = configuration.accounts, !picked.isEmpty {
-            let byID = Dictionary(all.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-            return picked.compactMap { byID[$0.id] }
+        let visible = all.filter { account in
+            switch account.group {
+            case .checking: return configuration.showChecking
+            case .savings: return configuration.showSavings
+            case .otherAsset: return configuration.showOtherAssets
+            case .liability: return configuration.showLiabilities
+            }
         }
-        let visible = configuration.showLiabilities ? all : all.filter { !$0.isLiability }
         // Assets first, then liabilities; largest balances first within each.
         return visible.sorted { a, b in
             if a.isLiability != b.isLiability { return !a.isLiability }
