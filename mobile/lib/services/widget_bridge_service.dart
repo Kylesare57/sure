@@ -143,7 +143,6 @@ class WidgetBridgeService {
                 'currency': a.currency,
                 if (a.classification != null) 'classification': a.classification,
                 'accountType': a.accountType,
-                if (a.subtype != null) 'subtype': a.subtype,
                 if (a.institutionName != null) 'institutionName': a.institutionName,
               },
         ],

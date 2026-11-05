@@ -22,27 +22,8 @@ struct SureWidgetAccount: Codable, Sendable, Identifiable, Hashable {
     var classification: String?
     var accountType: String?
     var institutionName: String?
-    /// Sure's account subtype, e.g. "checking" or "savings" for cash accounts.
-    var subtype: String? = nil
 
     var isLiability: Bool { classification == "liability" }
-
-    /// The group an account is shown or hidden with under "Edit Widget".
-    var group: SureWidgetAccountGroup {
-        if isLiability { return .liability }
-        guard accountType == "depository" else { return .otherAsset }
-        switch subtype?.lowercased() {
-        case "savings", "hsa", "cd", "money_market": return .savings
-        case "checking", "cash": return .checking
-        default:
-            // No subtype set in Sure: fall back to the account's name.
-            return name.localizedCaseInsensitiveContains("saving") ? .savings : .checking
-        }
-    }
-}
-
-enum SureWidgetAccountGroup {
-    case checking, savings, otherAsset, liability
 }
 
 struct SureWidgetSnapshot: Codable, Sendable {
@@ -256,10 +237,9 @@ private struct AccountsResponse: Decodable {
         let accountType: String?
         let status: String?
         let institutionName: String?
-        let subtype: String?
 
         enum CodingKeys: String, CodingKey {
-            case id, name, balance, currency, classification, status, subtype
+            case id, name, balance, currency, classification, status
             case balanceCents = "balance_cents"
             case accountType = "account_type"
             case institutionName = "institution_name"
@@ -269,7 +249,7 @@ private struct AccountsResponse: Decodable {
             SureWidgetAccount(
                 id: id.value, name: name, balance: balance, balanceCents: balanceCents,
                 currency: currency, classification: classification,
-                accountType: accountType, institutionName: institutionName, subtype: subtype
+                accountType: accountType, institutionName: institutionName
             )
         }
     }
