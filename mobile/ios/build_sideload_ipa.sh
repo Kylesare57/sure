@@ -12,7 +12,11 @@ APP="build/ios/iphoneos/Runner.app"
 
 echo "==> Building Flutter app (unsigned)"
 flutter pub get
-flutter build ios --release --no-codesign
+# pubspec.yaml only has a dev placeholder version (upstream CI sets the real one),
+# so give the sideload build a real version and an always-increasing build number.
+flutter build ios --release --no-codesign \
+  --build-name "${SIDELOAD_BUILD_NAME:-0.7.6}" \
+  --build-number "${SIDELOAD_BUILD_NUMBER:-$(date -u +%Y%m%d%H)}"
 
 if [ ! -d "$APP/PlugIns/SureWidget.appex" ]; then
   echo "!! SureWidget.appex is missing from the app. Check that the SureWidget"
